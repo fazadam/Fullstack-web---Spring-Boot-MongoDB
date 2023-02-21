@@ -35,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		// ha nincs benne a DBben ->regisztralja
 		if (userIsInDB == null) {
 
-			// ujonnan regisztralt felhasznalo kapja meg a ROLE_USER-t automatikusan
+			// ha uj user regisztral automatikusan megkapja a ROLE_USER-t
 			if (roleRepository.findByName("ROLE_USER") == null) {
 				System.out.println(roleUser);
 				roleRepository.save(roleUser);
