@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<h1>Sikeres bejelentkezes</h1>
+	<form sec:authorize="isAuthenticated()" id="frmlogout"
+		th:action="@{/logout}" method="post" class="form-inline">
+		| <a href="javascript:{}"
+			onclick="document.getElementById('frmlogout').submit(); return false;">Kijelentkezés</a>
+	</form>
+	
+		<a href="/user">UserPage</a>
+		<a href="/admin">AdminPage</a>
+		
+</body>
+</html>
