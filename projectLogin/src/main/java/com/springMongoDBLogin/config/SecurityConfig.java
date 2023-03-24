@@ -10,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.springMongoDBLogin.domain.User;
+
+
 
 
 @Configuration
@@ -21,29 +24,42 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 
+	
+	//kell h a gameservice-ben meg tudjam hivni mint player
+    @Bean
+    public User user() {
+        return new User();
+    }
+	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
 	}
+	
+
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests()
+		http.cors().and().csrf().disable()
+			.authorizeHttpRequests()
 
-				.requestMatchers("/admin").hasRole("ADMIN")
-				.requestMatchers("/user").hasRole("USER")
+				//.requestMatchers("/admin").hasRole("ADMIN")
+				//.requestMatchers("/user").hasRole("USER")
 				.requestMatchers("/registration").permitAll()
-				.requestMatchers("/reg").permitAll()
-				.anyRequest().authenticated()
-				.and()
-			.formLogin().permitAll()
-				.loginPage("/login")
-				.loginProcessingUrl("/login")
-				.defaultSuccessUrl("/", true)
-				.and()
-			.logout()
-				.logoutSuccessUrl("/login?logout")
-				.permitAll();
+				.requestMatchers("/cards").authenticated()
+				//.requestMatchers("/reg").permitAll()
+				//.requestMatchers("/cards").permitAll()
+				.anyRequest().permitAll();
+//	
+//				.and()
+//			.formLogin().permitAll()
+//				.loginPage("/login")
+//				.loginProcessingUrl("/login")
+//				.defaultSuccessUrl("/", true)
+//				.and()
+//			.logout()
+//				.logoutSuccessUrl("/login?logout")
+//				.permitAll();
 
 		return http.build();
 	}

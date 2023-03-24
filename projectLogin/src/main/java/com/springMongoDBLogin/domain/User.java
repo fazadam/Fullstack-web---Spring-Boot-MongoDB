@@ -1,15 +1,19 @@
 package com.springMongoDBLogin.domain;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.springMongoDBLogin.domain.cardGame.Card;
+
 @Document
 public class User {
 
 	// mongoDB automatikusan ad hozza generated ID-t, de itt tesztelem
+	
 	@Id
 	private String id;
 
@@ -18,6 +22,8 @@ public class User {
 	private String password;
 
 	private Set<Role> roles;
+	
+	private List<Card> allCards = new ArrayList<>();
 
 	public User() {
 	}
@@ -27,7 +33,16 @@ public class User {
 		this.password = password;
 		this.email = email;
 	}
+	
+	//teszt regisztralas
+	public User(String username, String password, String email, List<Card> allCards) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.allCards = allCards;
+	}
 
+	//nincsenek kartyak teszt
 	public User(String id, String email, String username, String password, Set<Role> roles) {
 		super();
 		this.id = id;
@@ -35,6 +50,17 @@ public class User {
 		this.username = username;
 		this.password = password;
 		this.roles = roles;
+	}
+	
+	//minden van
+	public User(String id, String email, String username, String password, Set<Role> roles, List<Card> allCards) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.username = username;
+		this.password = password;
+		this.roles = roles;
+		this.allCards = allCards;
 	}
 
 	public String getId() {
@@ -76,5 +102,15 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
+	public List<Card> getAllCards() {
+		return allCards;
+	}
+
+	public void setAllCards(List<Card> allCards) {
+		this.allCards = allCards;
+	}
+	
+	
 
 }
