@@ -46,7 +46,7 @@ public class GameService {
 	//adja at a playerHand-nak
 	//torolje a playerDeckbol
 	public List<Card> drawCardsFromDeck(String username) {
-		UserDetailsImpl user = (UserDetailsImpl) userService.loadUserByUsername(username);
+		User user =  (User) userService.loadUserByUsername(username);
 		this.playerDeck = user.getAllCards();
 		
 		//ez azert kell, mert kulonben mindig csak hozzaadodik ujabb 10 kartya az elozokhoz --> igy minden alkalommal uj ures lista lesz

@@ -5,14 +5,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.springMongoDBLogin.config.CustomAuthenticationProvider;
+//import com.springMongoDBLogin.config.CustomAuthenticationProvider;
 import com.springMongoDBLogin.domain.Role;
 import com.springMongoDBLogin.domain.User;
 import com.springMongoDBLogin.domain.cardGame.Card;
@@ -21,7 +21,7 @@ import com.springMongoDBLogin.repository.RoleRepository;
 import com.springMongoDBLogin.repository.UserRepository;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Autowired
 	private UserRepository userRepository;
@@ -33,6 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private CardService cardservice;
 	@Autowired
 	private CardRepository cardRepository;
+	
 
 	Role roleUser = new Role("ROLE_USER");
 	Role roleAdmin = new Role("ROLE_ADMIN");
@@ -77,7 +78,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		}
 	}
 
-	// login
+//	// login
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
@@ -107,7 +108,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			}
 		}
 
-		return UserDetailsImpl.build(user);
+		return user;
 	}
 
 	// minden kartya kikerese
@@ -216,13 +217,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		User user = userRepository.findByUsername(username); // loggedInUser session nevevel keresse ki
 
 		
-		if (newPassword != null && !newPassword.isEmpty()
-				&& !encoder.matches(newPassword, user.getPassword())) {
-			user.setPassword(encoder.encode(newPassword));
-		} else {
-			user.setPassword(user.getPassword());
-		}
-
+	    if (newPassword != null && !newPassword.isEmpty()) {
+	        user.setPassword(encoder.encode(newPassword));
+	        userRepository.save(user);
+	    }
 		//user.setPassword(newPassword);
 		userRepository.save(user);
 	}

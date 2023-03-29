@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springMongoDBLogin.domain.User;
 import com.springMongoDBLogin.domain.cardGame.Card;
 
-import com.springMongoDBLogin.service.UserDetailsImpl;
 import com.springMongoDBLogin.service.UserDetailsServiceImpl;
 
 @RestController
@@ -34,30 +32,30 @@ public class UserController {
 //	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<?> registration(@RequestBody User user) throws IOException {
+	public ResponseEntity<Void> registration(@RequestBody User user) throws IOException {
 		userService.registerUser(user);
-		return ResponseEntity.ok().body("user registered successfully");
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping("/cards/{username}")
 	public List<Card> getCardsByUserId(@PathVariable("username") String username) {
-        UserDetailsImpl user =  (UserDetailsImpl) userService.loadUserByUsername(username);
+        User user =   (User) userService.loadUserByUsername(username);
         System.out.println("a kartya lista at van kuldve");        
         return user.getAllCards();
     }
 
 	@GetMapping("/profile/{username}")
 	public  UserDetails getUser(@PathVariable("username") String username) {
-        UserDetailsImpl user =  (UserDetailsImpl) userService.loadUserByUsername(username);
+		User user =  (User) userService.loadUserByUsername(username);
         return user;
 	}
 	
-	@PutMapping("/profile/{username}/updateProfile")
-	public ResponseEntity<User> updateUserData(@PathVariable("username") String username,@RequestBody User userToUpdate) {
-		User udpatedUser = userService.updateUserData(username, userToUpdate);
-		System.out.println("user updated" + username + " with new values" + userToUpdate);
-		return ResponseEntity.ok().body(udpatedUser);
-	}
+//	@PutMapping("/profile/{username}/updateProfile")
+//	public ResponseEntity<User> updateUserData(@PathVariable("username") String username,@RequestBody User userToUpdate) {
+//		User udpatedUser = userService.updateUserData(username, userToUpdate);
+//		System.out.println("user updated" + username + " with new values" + userToUpdate);
+//		return ResponseEntity.ok().body(udpatedUser);
+//	}
 
 	@PutMapping("/profile/{username}/updateProfileUsername")
 	public ResponseEntity<Void> updateUserUsername(@PathVariable("username") String username,@RequestBody String newUsername) {
