@@ -2,6 +2,7 @@ package com.springMongoDBLogin.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +33,15 @@ public class UserController {
 //	}
 
 	@PostMapping("/registration")
-	public ResponseEntity<Void> registration(@RequestBody User user) throws IOException {
-		userService.registerUser(user);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<String> registration(@RequestBody User user) throws IOException {
+		try{
+			userService.registerUser(user);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+
 	}
 
 	@GetMapping("/cards/{username}")
@@ -50,6 +57,31 @@ public class UserController {
         return user;
 	}
 	
+	// Set  favorite videos
+	@PutMapping("/{username}/setfavoriteVideos")
+	public ResponseEntity<String> setUserFavoriteVideos(@PathVariable String username, @RequestBody String favoriteVideosUrl) {
+	    try {
+		userService.setFavouriteVideos(username, favoriteVideosUrl);
+		return ResponseEntity.ok().build();
+
+	    }catch(Exception e){
+			return ResponseEntity.badRequest().body(e.getMessage());
+	    }
+	}
+
+	// Get  favorite videos
+	@GetMapping("/{username}/getfavoriteVideos")
+	public Set<String> getUserFavoriteVideos(@PathVariable String username) {
+	    return userService.getFavouriteVideos(username);
+	}
+	
+	// Delete  favorite videos
+	@PutMapping("/{username}/deletefavoriteVideos")
+	public void deleteUserFavoriteVideos(@PathVariable String username, @RequestBody String favoriteVideosUrl) {
+	    userService.removeFavoriteVideos(username, favoriteVideosUrl);
+	}
+	
+	
 //	@PutMapping("/profile/{username}/updateProfile")
 //	public ResponseEntity<User> updateUserData(@PathVariable("username") String username,@RequestBody User userToUpdate) {
 //		User udpatedUser = userService.updateUserData(username, userToUpdate);
@@ -58,26 +90,36 @@ public class UserController {
 //	}
 
 	@PutMapping("/profile/{username}/updateProfileUsername")
-	public ResponseEntity<Void> updateUserUsername(@PathVariable("username") String username,@RequestBody String newUsername) {
+	public ResponseEntity<String> updateUserUsername(@PathVariable("username") String username,@RequestBody String newUsername) {
+		try {
 		userService.updateProfileUsername(username, newUsername);
 		return ResponseEntity.noContent().build();
+		}catch(Exception e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 	
 	@PutMapping("/profile/{username}/updateProfilePassword")
-	public ResponseEntity<Void> updateUserPassword(@PathVariable("username") String username,@RequestBody String newPassword) {
+	public ResponseEntity<String> updateUserPassword(@PathVariable("username") String username,@RequestBody String newPassword) {
+		try {
 		userService.updateProfilePassword(username, newPassword);
 		return ResponseEntity.noContent().build();
+		}catch (Exception e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+
+		}
 	}
 	
 	@PutMapping("/profile/{username}/updateProfileEmail")
-	public ResponseEntity<Void> updateUserEmail(@PathVariable("username") String username,@RequestBody String newEmail) {
+	public ResponseEntity<String> updateUserEmail(@PathVariable("username") String username,@RequestBody String newEmail) {
+		try {
 		userService.updateProfileEmail(username, newEmail);
 		return ResponseEntity.noContent().build();
+		} catch(Exception e){
+			System.out.println(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 	
-//
-//	@GetMapping("/cards")
-//	public List<Card> getCrads(){
-//		return cardService.getAllCardsFromTheRepo();
-//	}
+
 }

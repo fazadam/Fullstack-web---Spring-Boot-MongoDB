@@ -33,6 +33,8 @@ public class User implements UserDetails {
 	private String password;
 	
 	private String rawPassword;
+	
+	private Set<String> favouriteVideos;
 
 	private Set<Role> roles;
 	
@@ -43,6 +45,7 @@ public class User implements UserDetails {
 
 	public User() {
 	}
+
 
 	public User(String username, String password, String email) {
 		this.username = username;
@@ -80,7 +83,7 @@ public class User implements UserDetails {
 	}
 
 	public User(String id, String username, String email, String password, List<Card> allCards,
-			Collection<? extends GrantedAuthority> authorities) {
+			Collection<? extends GrantedAuthority> authorities,Set<String> favouriteVideos) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -88,6 +91,7 @@ public class User implements UserDetails {
 		this.password = password;
 		this.allCards = allCards;
 		this.authorities = authorities;
+		this.favouriteVideos = favouriteVideos;
 	}
 	
 	
@@ -97,7 +101,7 @@ public class User implements UserDetails {
 		for (Role role : user.getRoles()) {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
-		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities);
+		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities,user.getFavouriteVideos());
 	}
 	
 	public String getId() {
@@ -181,7 +185,14 @@ public class User implements UserDetails {
 	public void setRawPassword(String rawPassword) {
 		this.rawPassword = rawPassword;
 	}
-	
+
+	public Set<String> getFavouriteVideos() {
+		return favouriteVideos;
+	}
+
+	public void setFavouriteVideos(Set<String> favouriteVideos) {
+		this.favouriteVideos = favouriteVideos;
+	}
 	
 
 }

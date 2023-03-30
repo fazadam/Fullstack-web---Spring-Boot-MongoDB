@@ -21,7 +21,7 @@ import com.springMongoDBLogin.repository.RoleRepository;
 import com.springMongoDBLogin.repository.UserRepository;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService{
+public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -33,7 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	private CardService cardservice;
 	@Autowired
 	private CardRepository cardRepository;
-	
 
 	Role roleUser = new Role("ROLE_USER");
 	Role roleAdmin = new Role("ROLE_ADMIN");
@@ -41,9 +40,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	// regisztracio
 	public User registerUser(User userToRegister) throws IOException {
-		User userIsInDB = userRepository.findByUsername(userToRegister.getUsername());
 		// ha nincs benne a DBben ->regisztralja
-		if (userIsInDB == null) {
+		if (userRepository.findByUsername(userToRegister.getUsername()) != null) {
+			throw new RuntimeException("Username already taken: " + userToRegister.getUsername());
+		} else if (userRepository.findByEmail(userToRegister.getEmail()) != null) {
+			throw new RuntimeException("Email is already taken: " + userToRegister.getEmail());
+		} else {
 
 			// ha uj user regisztral automatikusan megkapja a ROLE_USER-t
 			if (roleRepository.findByName("ROLE_USER") == null) {
@@ -68,13 +70,10 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			// pw encoding w/ bcryptencoder --> securityConfigban van a bean
 			userToRegister.setPassword(encoder.encode(userToRegister.getPassword()));
 
+			// videoset
+			userToRegister.setFavouriteVideos(new HashSet<>());
+
 			return userRepository.save(userToRegister);
-
-		} else {
-
-			throw new RuntimeException(
-					"mar letezik a User az adatbazisban ezzel a nevvel " + userToRegister.getUsername());
-
 		}
 	}
 
@@ -119,6 +118,27 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 			throw new UsernameNotFoundException("User with username - " + username + " not found");
 
 		return user.getAllCards();
+	}
+
+	// user favourite videos
+	public void setFavouriteVideos(String username, String favouriteVideosUrl) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to add favorite videos");
+		}
+		user.getFavouriteVideos().add(favouriteVideosUrl);
+		userRepository.save(user);
+
+	}
+
+	public Set<String> getFavouriteVideos(String username) {
+		return userRepository.findByUsername(username).getFavouriteVideos();
+	}
+
+	public void removeFavoriteVideos(String username, String favouriteVideosUrl) {
+		User user = userRepository.findByUsername(username);
+		user.getFavouriteVideos().remove(favouriteVideosUrl);
+		userRepository.save(user);
 	}
 
 	// user profil udpatelese
@@ -211,18 +231,18 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		}
 		userRepository.save(user);
 	}
-	
-	//csak password update
+
+	// csak password update
 	public void updateProfilePassword(String username, String newPassword) {
 		User user = userRepository.findByUsername(username); // loggedInUser session nevevel keresse ki
 
-		
-	    if (newPassword != null && !newPassword.isEmpty()) {
-	        user.setPassword(encoder.encode(newPassword));
-	        userRepository.save(user);
-	    }
-		//user.setPassword(newPassword);
+		if (newPassword == null || newPassword.isEmpty() || encoder.matches(newPassword, user.getPassword())) {
+			throw new RuntimeException("choose different pw not the current one");
+		}
+
+		user.setPassword(encoder.encode(newPassword));
 		userRepository.save(user);
+
 	}
 
 }

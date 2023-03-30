@@ -73,6 +73,7 @@ public class CardService {
 		InputStream orcFighterStream = classLoader.getResourceAsStream("images/orcFighterCard.png");
 		InputStream orcCommanderStream = classLoader.getResourceAsStream("images/orcCommanderCard.png");
 		InputStream giantEaglesStream = classLoader.getResourceAsStream("images/giantEaglesCard.png");
+		InputStream sarumanStream = classLoader.getResourceAsStream("images/sarumanCard.png");
 
 		Card cardAragorn = createCard("Aragorn", 15, "melee", imageEncoder.encode(aragornStream.readAllBytes()));
 		Card cardLegolas = createCard("Legolas", 15, "ranged", imageEncoder.encode(legolasStream.readAllBytes()));
@@ -88,10 +89,11 @@ public class CardService {
 		Card orcFighterCard = createCard("Orc Fighter", 3, "melee", imageEncoder.encode(orcFighterStream.readAllBytes()));
 		Card orcCommanderCard = createCard("Orc Commander", 8, "melee", imageEncoder.encode(orcCommanderStream.readAllBytes()));
 		Card giantEaglesCard = createCard("Giant Eagles", 15, "ranged", imageEncoder.encode(giantEaglesStream.readAllBytes()));
+		Card sarumanCard = createCard("Saruman", 15, "ranged", imageEncoder.encode(sarumanStream.readAllBytes()));
 
 		List<Card> startingDeck = Arrays.asList(cardAragorn, cardLegolas, cardGondorianArcher, cardRohirrimRider,
 				cardGimli, cardFrodo, cardElrond, cardGandalfGrey, orcSiegeTowerCard, balrogCard, grondCard,
-				orcFighterCard, orcCommanderCard, giantEaglesCard);
+				orcFighterCard, orcCommanderCard, giantEaglesCard,sarumanCard);
 
 		return startingDeck;
 
@@ -103,6 +105,8 @@ public class CardService {
 		for (Card card : startingDeck) {
 			if (cardRepository.findByName(card.getName()) == null) {
 				cardRepository.save(card);
+				System.out.println(card.getName() + "saved to the repo");
+				
 			}
 		}
 	}

@@ -38,25 +38,26 @@ public class SecurityConfig {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder);
     }
+
 //	
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable()
-			.authorizeHttpRequests()
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors().and().csrf().disable()
+                .authorizeHttpRequests()
 
-				//.requestMatchers("/admin").hasRole("ADMIN")
-				//.requestMatchers("/user").hasRole("USER")
-				.requestMatchers("/registration").permitAll()
-				.requestMatchers("/cards").authenticated()
-				//.requestMatchers("/reg").permitAll()
-				//.requestMatchers("/cards").permitAll()
-				.anyRequest().permitAll();
+                //.requestMatchers("/admin").hasRole("ADMIN")
+                //.requestMatchers("/user").hasRole("USER")
+                .requestMatchers("/registration").permitAll()
+                .requestMatchers("/cards").authenticated()
+                //.requestMatchers("/reg").permitAll()
+                //.requestMatchers("/cards").permitAll()
+                .anyRequest().permitAll();
 //	
 //				.and()
 //			.formLogin().permitAll()
@@ -68,8 +69,8 @@ public class SecurityConfig {
 //				.logoutSuccessUrl("/login?logout")
 //				.permitAll();
 
-		return http.build();
-	}
+        return http.build();
+    }
 
 	
 }
