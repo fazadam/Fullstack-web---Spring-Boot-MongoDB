@@ -34,6 +34,7 @@ public class SecurityConfig {
         return new User();
     }
 
+    
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder);
     }

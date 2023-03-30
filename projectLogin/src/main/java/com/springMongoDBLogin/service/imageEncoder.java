@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class imageEncoder {
 	
-	public String encode(Path imagePath) throws IOException {
-		byte[] readImageBytes = Files.readAllBytes(imagePath);
-		String imageBase64EncodedBytes = Base64.getEncoder().encodeToString(readImageBytes);
+	public String encode(byte[] imageBytes) throws IOException {
+		//byte[] readImageBytes = Files.readAllBytes(bs);
+		String imageBase64EncodedBytes = Base64.getEncoder().encodeToString(imageBytes);
 		return new String(imageBase64EncodedBytes);
 	}
 
