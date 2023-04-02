@@ -1,6 +1,8 @@
 package com.springMongoDBLogin.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	Role roleAdmin = new Role("ROLE_ADMIN");
 	Set<Role> roles = new HashSet<>();
 
-	// regisztracio
+	// ============================================================== SIGN UP ==============================================================
 	public User registerUser(User userToRegister) throws IOException {
 		// ha nincs benne a DBben ->regisztralja
 		if (userRepository.findByUsername(userToRegister.getUsername()) != null) {
@@ -51,10 +53,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			if (roleRepository.findByName("ROLE_USER") == null) {
 				/* System.out.println(roleUser); */
 				roleRepository.save(roleUser);
-				roles.add(roleUser);
+				roles.add(roleRepository.findByName("ROLE_USER"));
 				userToRegister.setRoles(roles);
 			} else {
-				roles.add(roleUser);
+				roles.add(roleRepository.findByName("ROLE_USER"));
+
 				// roles.add(roleAdmin); //--> ha ket rolet kap az uj user is mukodik a UserPage
 				// es az AdminPage-re is
 				userToRegister.setRoles(roles);
@@ -64,7 +67,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			// cardrepoba ha van
 			// card repo minden kartyajat adja meg az uj usernek
 			// kesobb lehet h csak mondjuk nem mindet csak bizonyos kezdot pl 20at?
-			cardservice.addNewCardsToTheRepo();
+//			cardservice.addNewCardsToTheRepo();
 			userToRegister.setAllCards(cardRepository.findAll());
 
 			// pw encoding w/ bcryptencoder --> securityConfigban van a bean
@@ -72,12 +75,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 			// videoset
 			userToRegister.setFavouriteVideos(new HashSet<>());
-
+			//pendingRequests
+			userToRegister.setPendingRoleRequests(new HashSet<>());
 			return userRepository.save(userToRegister);
 		}
 	}
 
-//	// login
+	// ============================================================== LOGIN ==============================================================
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
@@ -85,11 +89,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		if (user == null)
 			throw new UsernameNotFoundException("User with username - " + username + " not found");
 
-		try {
-			cardservice.addNewCardsToTheRepo();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			cardservice.addNewCardsToTheRepo();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		// van-e uj kartya a cardrepoban miota regisztralt?
 		List<Card> allCardsInTheRepo = cardRepository.findAll();
@@ -110,7 +114,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return user;
 	}
 
-	// minden kartya kikerese
+	// ============================================================== List of all cards OF A USER==============================================================
 	public List<Card> printAllCardsOfTheUser(String username) {
 
 		User user = userRepository.findByUsername(username);
@@ -120,7 +124,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return user.getAllCards();
 	}
 
-	// user favourite videos
+	
+	// ============================================================== List of all USERS ==============================================================
+	public List<User> listAllUsers() {
+	    return 	   userRepository.findAll();
+
+	}
+
+	// ============================================================== Favourite Videos ==============================================================
+
 	public void setFavouriteVideos(String username, String favouriteVideosUrl) {
 		User user = userRepository.findByUsername(username);
 		if (user == null) {
@@ -140,6 +152,93 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		user.getFavouriteVideos().remove(favouriteVideosUrl);
 		userRepository.save(user);
 	}
+	
+	
+	// ============================================================== Pending Admin Requests ==============================================================
+	public void setPendingAdminRequest(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to request admin role");
+		}
+		 Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+		    for (Role role : user.getPendingRoleRequests()) {
+		        if (role.getName().equals(adminRole.getName())) {
+		        	System.out.println("already requested");
+		            return;
+		        }
+		    }
+
+		    user.getPendingRoleRequests().add(adminRole);
+		    userRepository.save(user);
+	}
+	
+	public void grantPendingAdminRequest(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to request admin role");
+		}
+		
+	    Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+	    System.out.println(adminRole);
+	    System.out.println(user.getRoles());
+	    System.out.println(user.getPendingRoleRequests());
+	    if (user.getRoles().contains(adminRole)) {
+	        System.out.println("User already has admin role.");
+	        return;
+	    }
+	    user.getPendingRoleRequests().removeIf(role -> role.equals(adminRole)); // sima removenal az equals mas helyre mutat mint a repos adminrole?
+		user.getRoles().add(adminRole);
+		userRepository.save(user);
+	}
+	
+	public void declinePendingAdminRequest(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to request admin role");
+		}
+		user.getPendingRoleRequests().removeIf(role -> role.equals(roleRepository.findByName("ROLE_ADMIN")));
+		userRepository.save(user);
+	}
+	
+	public void revokeAdminRole(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to request admin role");
+		}
+		user.getRoles().removeIf(role -> role.equals(roleRepository.findByName("ROLE_ADMIN")));
+		userRepository.save(user);
+
+	}
+	
+	public void deleteUserFromRepo(String username) {
+		User user = userRepository.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("first login to request admin role");
+		}
+		userRepository.delete(user);
+	}
+	
+	
+
+	public List<User> listAllPendingAdminRequestUsers(){
+	    List<User> usersWithPendingAdminRequests = new ArrayList<>();
+	    
+	    for(User user: userRepository.findAll()) {
+	        if(user.getPendingRoleRequests() != null && !user.getPendingRoleRequests().isEmpty()) {
+	            usersWithPendingAdminRequests.add(user);
+	        }
+	    }
+	    return usersWithPendingAdminRequests;
+	}
+	
+	public List<Card> allCardsList(){
+		return cardRepository.findAll();
+	}
+	
+	
+	
+	// ======================================= UPDATE USER ============================
+
 
 	// user profil udpatelese
 	public User updateUserData(String username, User userToUpdate) {
@@ -159,6 +258,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			userToUpdate.setPassword(user.getPassword());
 		}
 
+		
+		
+		
+		
 		user.setPassword(userToUpdate.getPassword());
 
 //		// vesse ossze a db-ben levo jelszoval, ha megegyezik -> Error =
@@ -244,5 +347,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		userRepository.save(user);
 
 	}
+
+	//=================== alll cards ===========
 
 }

@@ -99,19 +99,34 @@ public class CardService {
 
 	}
 
-	// check uj kartyak a repo ellen es ha nincs benne akkor tegye bele a repoba
-	public void addNewCardsToTheRepo() throws IOException {
-		List<Card> startingDeck = CreateStartingDeckCards();
-		for (Card card : startingDeck) {
-			if (cardRepository.findByName(card.getName()) == null) {
-				cardRepository.save(card);
-				System.out.println(card.getName() + "saved to the repo");
-				
-			}
-		}
-	}
+//	// check uj kartyak a repo ellen es ha nincs benne akkor tegye bele a repoba
+//	public void addNewCardsToTheRepo() throws IOException {
+//		List<Card> startingDeck = CreateStartingDeckCards();
+//		for (Card card : startingDeck) {
+//			if (cardRepository.findByName(card.getName()) == null) {
+//				cardRepository.save(card);
+//				System.out.println(card.getName() + "saved to the repo");
+//				
+//			}
+//		}
+//	}
 
 	public List<Card> getAllCardsFromTheRepo() {
 		return cardRepository.findAll();
 	}
-}
+	
+	public void deleteCardFromRepo(String cardName) {
+		Card cardToDelete = cardRepository.findByName(cardName);
+		cardRepository.delete(cardToDelete);
+	}
+	
+	public Card createNewCardFromFrontend(Card card) throws IOException {
+	    if (cardRepository.findByName(card.getName()) != null) {
+	        throw new RuntimeException("Card with name " + card.getName() + " already exists");
+	    }
+
+	    
+	    Card newCard = new Card(card.getName(), card.getPower(), card.getType(), card.getPicture());
+	    return cardRepository.save(newCard);
+	}
+	}

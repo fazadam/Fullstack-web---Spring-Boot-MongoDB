@@ -2,6 +2,7 @@ package com.springMongoDBLogin.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,8 @@ public class User implements UserDetails {
 
 	private Set<Role> roles;
 	
+	private Set<Role> pendingRoleRequests;
+	
 	private List<Card> allCards = new ArrayList<>();
 	
 	private Collection<? extends GrantedAuthority> authorities;
@@ -47,43 +50,8 @@ public class User implements UserDetails {
 	}
 
 
-	public User(String username, String password, String email) {
-		this.username = username;
-		this.password = password;
-		this.email = email;
-	}
-	
-	//teszt regisztralas
-	public User(String username, String password, String email, List<Card> allCards) {
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.allCards = allCards;
-	}
-
-	//nincsenek kartyak teszt
-	public User(String id, String email, String username, String password, Set<Role> roles) {
-		super();
-		this.id = id;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.roles = roles;
-	}
-	
-	//minden van
-	public User(String id, String email, String username, String password, Set<Role> roles, List<Card> allCards) {
-		super();
-		this.id = id;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.roles = roles;
-		this.allCards = allCards;
-	}
-
 	public User(String id, String username, String email, String password, List<Card> allCards,
-			Collection<? extends GrantedAuthority> authorities,Set<String> favouriteVideos) {
+			Collection<? extends GrantedAuthority> authorities,Set<String> favouriteVideos,Set<Role> pendingRoleRequests) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -92,6 +60,7 @@ public class User implements UserDetails {
 		this.allCards = allCards;
 		this.authorities = authorities;
 		this.favouriteVideos = favouriteVideos;
+		this.pendingRoleRequests = pendingRoleRequests;
 	}
 	
 	
@@ -101,7 +70,7 @@ public class User implements UserDetails {
 		for (Role role : user.getRoles()) {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
-		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities,user.getFavouriteVideos());
+		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities,user.getFavouriteVideos(),user.getPendingRoleRequests());
 	}
 	
 	public String getId() {
@@ -192,6 +161,16 @@ public class User implements UserDetails {
 
 	public void setFavouriteVideos(Set<String> favouriteVideos) {
 		this.favouriteVideos = favouriteVideos;
+	}
+
+
+	public Set<Role> getPendingRoleRequests() {
+		return pendingRoleRequests;
+	}
+
+
+	public void setPendingRoleRequests(Set<Role> pendingRoleRequests) {
+		this.pendingRoleRequests = pendingRoleRequests;
 	}
 	
 

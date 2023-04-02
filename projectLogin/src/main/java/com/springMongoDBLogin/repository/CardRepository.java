@@ -12,5 +12,8 @@ public interface CardRepository extends MongoRepository<Card,String>{
 	
 	Card findByName(String name);
 	
+
+
+	
 	//List<Card> saveAll(List<Card> cards);
 }
