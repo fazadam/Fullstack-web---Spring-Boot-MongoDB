@@ -22,11 +22,11 @@ public class GameController {
 	@Autowired
 	private BoardService boardService;
 
-	@GetMapping("/draw/{username}")
-	public List<Card> drawCards(@PathVariable("username") String username) {
-		return gameService.drawCardsFromDeck(username);
+	@GetMapping("/draw/{username}/{deckname}")
+	public List<Card> drawCards(@PathVariable String username, @PathVariable String deckname) {
+	    return gameService.drawCardsFromDeck(username, deckname);
 	}
-
+	
 	@PostMapping("/playCard/{row}/{index}")
 	public void playCard(@PathVariable String row, @PathVariable int index) {
 		gameService.playCard(index, row);

@@ -1,6 +1,5 @@
 package com.springMongoDBLogin.domain.cardGame;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,20 +7,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Deck {
 
-	private List<Card> cards = new ArrayList<>();
-	
-	public Deck(List<Card> cards) {
-		super();
-		this.cards = cards;
-	}
+    private final String name;
+    private final List<Card> cards;
 
-	public List<Card> getCards() {
-		return cards;
-	}
+    public Deck(String name, List<Card> cards) {
+        this.name = name;
+        this.cards = cards;
+    }
 
-	public void setCards(List<Card> cards) {
-		this.cards = cards;
-	}
-	
+    public String getName() {
+        return name;
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
 	
 }

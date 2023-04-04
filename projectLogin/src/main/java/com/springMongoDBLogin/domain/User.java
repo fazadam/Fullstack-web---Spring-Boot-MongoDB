@@ -2,8 +2,10 @@ package com.springMongoDBLogin.domain;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -43,6 +45,10 @@ public class User implements UserDetails {
 	
 	private List<Card> allCards = new ArrayList<>();
 	
+	private Map<String, List<String>> userDecks = new HashMap<>();
+	
+
+
 	private Collection<? extends GrantedAuthority> authorities;
 
 
@@ -51,7 +57,7 @@ public class User implements UserDetails {
 
 
 	public User(String id, String username, String email, String password, List<Card> allCards,
-			Collection<? extends GrantedAuthority> authorities,Set<String> favouriteVideos,Set<Role> pendingRoleRequests) {
+			Collection<? extends GrantedAuthority> authorities,Set<String> favouriteVideos,Set<Role> pendingRoleRequests,Map<String,List<String>> userDecks) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -61,6 +67,7 @@ public class User implements UserDetails {
 		this.authorities = authorities;
 		this.favouriteVideos = favouriteVideos;
 		this.pendingRoleRequests = pendingRoleRequests;
+		this.userDecks = userDecks;
 	}
 	
 	
@@ -70,7 +77,7 @@ public class User implements UserDetails {
 		for (Role role : user.getRoles()) {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
-		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities,user.getFavouriteVideos(),user.getPendingRoleRequests());
+		return new User(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getAllCards(),authorities,user.getFavouriteVideos(),user.getPendingRoleRequests(),user.getUserDecks());
 	}
 	
 	public String getId() {
@@ -173,5 +180,13 @@ public class User implements UserDetails {
 		this.pendingRoleRequests = pendingRoleRequests;
 	}
 	
+	public Map<String, List<String>> getUserDecks() {
+		return userDecks;
+	}
+
+
+	public void setUserDecks(Map<String, List<String>> userDecks) {
+		this.userDecks = userDecks;
+	}
 
 }

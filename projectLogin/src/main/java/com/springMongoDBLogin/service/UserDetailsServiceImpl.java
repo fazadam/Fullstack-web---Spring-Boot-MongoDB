@@ -3,8 +3,10 @@ package com.springMongoDBLogin.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +79,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			userToRegister.setFavouriteVideos(new HashSet<>());
 			//pendingRequests
 			userToRegister.setPendingRoleRequests(new HashSet<>());
+			userToRegister.setUserDecks(new HashMap<>());
+
 			return userRepository.save(userToRegister);
 		}
 	}
@@ -179,9 +183,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		}
 		
 	    Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-	    System.out.println(adminRole);
-	    System.out.println(user.getRoles());
-	    System.out.println(user.getPendingRoleRequests());
+
 	    if (user.getRoles().contains(adminRole)) {
 	        System.out.println("User already has admin role.");
 	        return;
@@ -348,6 +350,54 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	}
 
-	//=================== alll cards ===========
+	// ================== deckhez kapcsolod =================
+	
+	public void createDeck(String username, String deckname, List<String> cardList) {
+	    User user = userRepository.findByUsername(username);
 
+	    Map<String, List<String>> userDecks = user.getUserDecks();
+	    userDecks.put(deckname, new ArrayList<>());
+	    for (String cardName : cardList) {
+	        userDecks.get(deckname).add(cardName);
+	    }
+	    userRepository.save(user);
+	}
+	
+	
+	public List<Card> getCardsForDeck(String username, String deckname) {
+	    User user = userRepository.findByUsername(username);
+	    if (user == null) {
+	        throw new RuntimeException("User not found: " + username);
+	    }
+	    Map<String, List<String>> userDecks = user.getUserDecks(); //letezik e a deck a user deck map-jeben
+	    if (!userDecks.containsKey(deckname)) {
+	        throw new RuntimeException("No deck with name:  " + deckname);
+	    }
+	    
+	    
+	    List<Card> cards = new ArrayList<>();
+	    for (String cardName : userDecks.get(deckname)) {
+	        Card card = cardRepository.findByName(cardName);
+	        if (card == null) {
+	            throw new RuntimeException("Card not found: " + cardName);
+	        }
+	        cards.add(card);
+	    }
+	    return cards;
+	}
+	
+	public void deleteUsersDeck(String username, String deckname) {
+	    User user = userRepository.findByUsername(username);
+	    if (user == null) {
+	        throw new RuntimeException("User not found: " + username);
+	    }
+
+	    if(user.getUserDecks().containsKey(deckname)) {
+	    	user.getUserDecks().remove(deckname);
+	    }
+	    
+	    userRepository.save(user);
+	}
+
+	
 }

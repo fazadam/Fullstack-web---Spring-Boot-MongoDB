@@ -2,6 +2,7 @@ package com.springMongoDBLogin.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,14 @@ import org.springframework.stereotype.Service;
 
 import com.springMongoDBLogin.domain.User;
 import com.springMongoDBLogin.domain.cardGame.Card;
+import com.springMongoDBLogin.repository.CardRepository;
 
 @Service
 public class GameService {
 
+	@Autowired
+	private CardRepository cardRepository;
+	
 	@Autowired
 	private BoardService boardService;
 
@@ -45,10 +50,26 @@ public class GameService {
 	//random szam alapjan vegyen ki belole 10et
 	//adja at a playerHand-nak
 	//torolje a playerDeckbol
-	public List<Card> drawCardsFromDeck(String username) {
+	public List<Card> drawCardsFromDeck(String username, String deckname) {
 		User user =  (User) userService.loadUserByUsername(username);
-		this.playerDeck = user.getAllCards();
-		
+	    Map<String, List<String>> userDecks = user.getUserDecks();
+	    
+	    // Check if the deck exists in the user's deck map
+	    if (!userDecks.containsKey(deckname)) {
+	        throw new RuntimeException("No deck with name: " + deckname);
+	    }
+	    
+	    this.playerDeck = new ArrayList<>();
+	    for (String cardName : userDecks.get(deckname)) {
+	        Card card = cardRepository.findByName(cardName);
+	        if (card == null) {
+	            throw new RuntimeException("Card not found: " + cardName);
+	        }
+	        this.playerDeck.add(card);
+	        System.out.println(card.getName());
+//	        System.out.println(this.playerDeck);
+	    }
+	    		
 		//ez azert kell, mert kulonben mindig csak hozzaadodik ujabb 10 kartya az elozokhoz --> igy minden alkalommal uj ures lista lesz
 		this.playerHand = new ArrayList<>();
 
@@ -59,11 +80,14 @@ public class GameService {
 			}
 			int randomNumber = randomCardFromDeck.nextInt(playerDeck.size());
 			Card card = playerDeck.get(randomNumber);
-			playerHand.add(card);
-
 			playerDeck.remove(card);
 
+			playerHand.add(card);
+			System.out.println(card.getName());
+
 		}
+        System.out.println(this.playerHand);
+        System.out.println("playerDeck size : " + playerDeck.size());
 		System.out.println(playerHand.size());
 
 		return playerHand;

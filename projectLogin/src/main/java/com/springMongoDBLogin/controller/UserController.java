@@ -30,7 +30,7 @@ public class UserController {
 	private UserDetailsServiceImpl userService;
 	@Autowired
 	private CardService cardService;
-	
+
 //	@RequestMapping("/")
 //	public String home() {
 //		return "home";
@@ -49,7 +49,7 @@ public class UserController {
 	}
 
 	@GetMapping("/cards/{username}")
-	public List<Card> getCardsByUserId(@PathVariable("username") String username) {
+	public List<Card> getCardsByUser(@PathVariable("username") String username) {
 		User user = (User) userService.loadUserByUsername(username);
 		System.out.println("a kartya lista at van kuldve");
 		return user.getAllCards();
@@ -90,7 +90,7 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
-	
+
 	@PutMapping("/profile/declineAdminRequest/{username}")
 	public ResponseEntity<String> declineAdminRequest(@PathVariable String username) {
 
@@ -103,7 +103,7 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
-	
+
 	@PutMapping("/profile/revokeAdminRole/{username}")
 	public ResponseEntity<String> revokeAdminRole(@PathVariable String username) {
 
@@ -116,6 +116,7 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
+
 	@PutMapping("/profile/deleteUser/{username}")
 	public ResponseEntity<String> deletUser(@PathVariable String username) {
 
@@ -221,8 +222,8 @@ public class UserController {
 	}
 
 	@PutMapping("/grantAdminRole/{username}")
-	public ResponseEntity<String> grantAdminRole(@PathVariable("username") String username){
-			
+	public ResponseEntity<String> grantAdminRole(@PathVariable("username") String username) {
+
 		try {
 			userService.grantPendingAdminRequest(username);
 			return ResponseEntity.noContent().build();
@@ -231,10 +232,10 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
-	
+
 	@PutMapping("/deleteCard/{cardName}")
-	public ResponseEntity<String> deleteCardFromRepo(@PathVariable("cardName") String cardName){
-			
+	public ResponseEntity<String> deleteCardFromRepo(@PathVariable("cardName") String cardName) {
+
 		try {
 			cardService.deleteCardFromRepo(cardName);
 			return ResponseEntity.noContent().build();
@@ -243,9 +244,9 @@ public class UserController {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
-	
-    @PutMapping("/createNewCardFrontend")
-    public ResponseEntity<String> createNewCardFromFrontend(@RequestBody Card card) throws IOException {
+
+	@PutMapping("/createNewCardFrontend")
+	public ResponseEntity<String> createNewCardFromFrontend(@RequestBody Card card) throws IOException {
 		try {
 			cardService.createNewCardFromFrontend(card);
 			return ResponseEntity.noContent().build();
@@ -253,5 +254,41 @@ public class UserController {
 			System.out.println(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
-    }
+	}
+	
+	// ======= deck reszek =====
+
+	@PutMapping("/{username}/cards/{deckname}")
+	public ResponseEntity<String> createDeck(@PathVariable String username, @PathVariable String deckname,
+			@RequestBody List<String> cardList) {
+		try {
+			userService.createDeck(username, deckname, cardList);
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/{username}/cards/{deckname}/deckCards")
+	public List<Card> giveUsersDeckCards(@PathVariable String username, @PathVariable String deckname) {
+		return userService.getCardsForDeck(username, deckname);
+	}
+
+	@GetMapping("/{username}/cards/{deckname}/existingDecks")
+	public List<Card> giveUsersExistingDecks(@PathVariable String username, @PathVariable String deckname) {
+		return userService.getCardsForDeck(username, deckname);
+	}
+
+	@PutMapping("/{username}/cards/{deckname}/deleteDeck")
+	public ResponseEntity<String> deleteUsersDeck(@PathVariable("username") String username,
+			@PathVariable("deckname") String deckname) {
+		try {
+			userService.deleteUsersDeck(username, deckname);
+			return ResponseEntity.noContent().build();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
 }

@@ -129,4 +129,5 @@ public class CardService {
 	    Card newCard = new Card(card.getName(), card.getPower(), card.getType(), card.getPicture());
 	    return cardRepository.save(newCard);
 	}
-	}
+	
+}
