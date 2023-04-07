@@ -14,17 +14,14 @@ public class Card {
 	private String id;
 	
 	private String name;
-	
-	private int power;
-	
+		
 	private String type;
 	
 	private String picture;
 	
-	public Card( String name, int power, String type,String picture) throws IOException{
+	public Card( String name, String type,String picture) throws IOException{
 		super();
 		this.name = name;
-		this.power = power;
 		this.type = type;
 		this.picture = picture;
 	}
@@ -43,14 +40,6 @@ public class Card {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public int getPower() {
-		return power;
-	}
-
-	public void setPower(int power) {
-		this.power = power;
 	}
 
 	public String getType() {

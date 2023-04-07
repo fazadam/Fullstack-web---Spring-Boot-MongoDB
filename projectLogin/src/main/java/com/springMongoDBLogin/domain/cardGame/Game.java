@@ -1,64 +1,78 @@
 package com.springMongoDBLogin.domain.cardGame;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.springMongoDBLogin.domain.User;
 
 @Document
 public class Game {
 
 	@Id
 	private String id;
-	private List<User> players = new ArrayList<>();
-	private Deck deck;
-	private boolean isOver;
 	
-	public Game(String id, List<User> players, Deck deck, boolean isOver) {
-		super();
-		this.id = id;
-		this.players = players;
-		this.deck = deck;
-		this.isOver = isOver;
-	}
+	private String gameName;
+	
+	private String gamePassword;
 
+	private Set<GamePlayer> players;
+	
+	private String activePlayerName;
+	
+	
+	
 	public Game() {
+		super();
 	}
 
-	public String getId() {
-		return id;
+	public Game(String gameName, String gamePassword, Set<GamePlayer> players, String activePlayerName) {
+		super();
+		this.gameName = gameName;
+		this.gamePassword = gamePassword;
+		this.players = players;
+		this.activePlayerName = activePlayerName;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+
+	
+	public String getGameName() {
+		return gameName;
 	}
 
-	public List<User> getPlayers() {
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
+	}
+
+	public String getGamePassword() {
+		return gamePassword;
+	}
+
+	public void setGamePassword(String gamePassword) {
+		this.gamePassword = gamePassword;
+	}
+
+	public Set<GamePlayer> getPlayers() {
 		return players;
 	}
 
-	public void setPlayers(List<User> players) {
+	public void setPlayers(Set<GamePlayer> players) {
 		this.players = players;
 	}
 
-	public Deck getDeck() {
-		return deck;
+	public String getActivePlayerName() {
+		return activePlayerName;
 	}
 
-	public void setDeck(Deck deck) {
-		this.deck = deck;
+	public void setActivePlayerName(String activePlayerName) {
+		this.activePlayerName = activePlayerName;
 	}
 
-	public boolean isOver() {
-		return isOver;
-	}
 
-	public void setOver(boolean isOver) {
-		this.isOver = isOver;
-	}
-	
+
+    // check if the game has two players
+    public boolean isFull() {
+        return this.players.size() >= 2;
+    }
 	
 }

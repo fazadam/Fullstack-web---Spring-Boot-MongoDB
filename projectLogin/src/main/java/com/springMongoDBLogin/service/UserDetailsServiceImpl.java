@@ -69,7 +69,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			// cardrepoba ha van
 			// card repo minden kartyajat adja meg az uj usernek
 			// kesobb lehet h csak mondjuk nem mindet csak bizonyos kezdot pl 20at?
-//			cardservice.addNewCardsToTheRepo();
+			cardservice.addNewCardsToTheRepo();
+			
+			
 			userToRegister.setAllCards(cardRepository.findAll());
 
 			// pw encoding w/ bcryptencoder --> securityConfigban van a bean
