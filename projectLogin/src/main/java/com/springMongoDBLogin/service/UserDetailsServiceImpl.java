@@ -60,7 +60,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			} else {
 				roles.add(roleRepository.findByName("ROLE_USER"));
 
-				// roles.add(roleAdmin); //--> ha ket rolet kap az uj user is mukodik a UserPage
+				 roles.add(roleAdmin); //--> ha ket rolet kap az uj user is mukodik a UserPage
 				// es az AdminPage-re is
 				userToRegister.setRoles(roles);
 			}

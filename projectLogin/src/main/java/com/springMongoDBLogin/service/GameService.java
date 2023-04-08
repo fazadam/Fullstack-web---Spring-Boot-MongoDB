@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.springMongoDBLogin.domain.User;
 import com.springMongoDBLogin.domain.cardGame.Card;
@@ -28,9 +29,6 @@ public class GameService {
 	private CardRepository cardRepository;
 
 	@Autowired
-	private BoardService boardService;
-
-	@Autowired
 	private UserDetailsServiceImpl userService;
 
 	@Autowired
@@ -39,12 +37,7 @@ public class GameService {
 	private List<Card> playerHand;
 	private List<Card> playerDeck;
 
-//    public GameService(User player) {
-//        this.playerDeck = player.getAllCards();
-//        this.playerHand = drawCardsFromDeck(10);
-//    }
 
-	// constructor mindenhez
 	public GameService(BoardService boardService, UserDetailsServiceImpl userService, User player,
 			List<Card> playerHand, List<Card> playerDeck) {
 		super();
@@ -89,7 +82,7 @@ public class GameService {
 			throw new RuntimeException("Game not found: " + gameName);
 		}
 
-		System.out.println(gamePlayer.getCurrentDeckCards());
+		//System.out.println(gamePlayer.getCurrentDeckCards());
 
 		boolean playerExists = false;
 		for (GamePlayer player : game.getPlayers()) {
@@ -99,10 +92,10 @@ public class GameService {
 					return "wait for opponents turn";
 				}
 				player.setActiveCard(gamePlayer.getActiveCard());
-			//	player.getCurrentDeckCards().remove(gamePlayer.getActiveCard());
-				
-				
-				System.out.println(player.getCurrentDeckCards());
+				// player.getCurrentDeckCards().remove(gamePlayer.getActiveCard());
+				player.setCurrentDeckCards(gamePlayer.getCurrentDeckCards());
+
+				//System.out.println(player.getCurrentDeckCards());
 				break;
 			}
 		}
@@ -199,11 +192,9 @@ public class GameService {
 		GamePlayer player1 = playersList.get(0);
 		GamePlayer player2 = playersList.get(1);
 
-		// Get the active cards of the two players
 		Card card1 = player1.getActiveCard();
 		Card card2 = player2.getActiveCard();
 
-		// Play the game using the cards
 		String type1 = card1.getType();
 		String type2 = card2.getType();
 		String[] types = { "orc", "human", "istari", "dwarf", "elf" };
@@ -214,7 +205,11 @@ public class GameService {
 			throw new IllegalArgumentException("Invalid card type");
 		}
 
-		int[][] results = { { 0, 2, 1, 1, 2 }, { 1, 0, 2, 2, 1 }, { 2, 1, 0, 1, 2 }, { 2, 1, 2, 0, 1 },
+		int[][] results = { 
+				{ 0, 2, 1, 1, 2 }, 
+				{ 1, 0, 2, 2, 1 },
+				{ 2, 1, 0, 1, 2 }, 
+				{ 2, 1, 2, 0, 1 },
 				{ 1, 2, 1, 2, 0 } };
 
 		int result = results[index1][index2];
@@ -222,15 +217,29 @@ public class GameService {
 		if (result == 0) {
 			return "It's a tie!";
 		} else if (result == 1) {
+			
+	        if (!(player1.getGamePoints() >= 5)) {
 			player1.setGamePoints(player1.getGamePoints() + 1);
+			gameRepository.save(game);
+
 			return player1.getPlayerName() + " wins! " + type1 + " beats " + type2 + " " + player1.getPlayerName()
 					+ " points: " + player1.getGamePoints() + " " + player2.getPlayerName() + " points: "
 					+ player2.getGamePoints();
+	        } else {
+	            return player1.getPlayerName() + " wins the game!";
+	        }
 		} else {
-			player2.setGamePoints(player1.getGamePoints() + 1);
+	        if (!(player2.getGamePoints() >= 5)) {
+
+			player2.setGamePoints(player2.getGamePoints() + 1);
+			gameRepository.save(game);
+
 			return player2.getPlayerName() + " wins! " + type2 + " beats " + type1 + " " + player1.getPlayerName()
 					+ " points: " + player1.getGamePoints() + " " + player2.getPlayerName() + " points: "
 					+ player2.getGamePoints();
+	        } else {
+	            return player2.getPlayerName() + " wins the game!";
+	        }
 		}
 	}
 
