@@ -41,7 +41,6 @@ public class GameService {
 	public GameService(BoardService boardService, UserDetailsServiceImpl userService, User player,
 			List<Card> playerHand, List<Card> playerDeck) {
 		super();
-		this.boardService = boardService;
 		this.userService = userService;
 		this.player = player;
 		this.playerHand = playerHand;
@@ -218,27 +217,35 @@ public class GameService {
 			return "It's a tie!";
 		} else if (result == 1) {
 			
-	        if (!(player1.getGamePoints() >= 5)) {
 			player1.setGamePoints(player1.getGamePoints() + 1);
 			gameRepository.save(game);
 
-			return player1.getPlayerName() + " wins! " + type1 + " beats " + type2 + " " + player1.getPlayerName()
-					+ " points: " + player1.getGamePoints() + " " + player2.getPlayerName() + " points: "
-					+ player2.getGamePoints();
-	        } else {
+			
+	        if ((player1.getGamePoints() >= 5) || player2.getCurrentDeckCards().isEmpty()) {
 	            return player1.getPlayerName() + " wins the game!";
+
+	        } else {
+
+				return player1.getPlayerName() + " wins! " + type1 + " beats: " + type2 + " - " + player1.getPlayerName()
+						+ " points: " + player1.getGamePoints() + " - " + player2.getPlayerName() + " points: "
+						+ player2.getGamePoints();
 	        }
 		} else {
-	        if (!(player2.getGamePoints() >= 5)) {
-
+			
 			player2.setGamePoints(player2.getGamePoints() + 1);
 			gameRepository.save(game);
 
-			return player2.getPlayerName() + " wins! " + type2 + " beats " + type1 + " " + player1.getPlayerName()
-					+ " points: " + player1.getGamePoints() + " " + player2.getPlayerName() + " points: "
-					+ player2.getGamePoints();
-	        } else {
+			
+	        if ((player2.getGamePoints() >= 5) || player1.getCurrentDeckCards().isEmpty()) {
 	            return player2.getPlayerName() + " wins the game!";
+
+
+	        } else {
+	        	
+
+			return player2.getPlayerName() + " wins! " + type2 + " beats: " + type1 + " - " + player1.getPlayerName()
+					+ " points: " + player1.getGamePoints() + " - " + player2.getPlayerName() + " points: "
+					+ player2.getGamePoints();
 	        }
 		}
 	}

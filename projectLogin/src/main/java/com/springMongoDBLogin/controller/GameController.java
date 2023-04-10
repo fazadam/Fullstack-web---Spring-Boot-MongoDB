@@ -57,9 +57,7 @@ public class GameController {
 			@RequestBody GamePlayer gamePlayer) {
 		try {
 			gameService.playCard(gameName, gamePlayer);
-            System.out.println("kliensrol jovo deck meret: " + gamePlayer.getCurrentDeckCards().size());
-
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			return ResponseEntity.badRequest().body(e.getMessage());
